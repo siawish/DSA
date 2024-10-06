@@ -1,0 +1,5 @@
+﻿  ExtraTask.cpp
+C:\Users\HMMS\source\repos\DSA_ASSIGN_01\DSA_ASSIGN_01\ExtraTask.cpp(9,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  task 01.cpp
+  Generating Code...
+  DSA_ASSIGN_01.vcxproj -> C:\Users\HMMS\source\repos\DSA_ASSIGN_01\x64\Debug\DSA_ASSIGN_01.exe
