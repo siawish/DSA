@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\HMMS\source\repos\POLYNOMIAL-EVALUATION\POLYNOMIAL-EVALUATION\main.cpp(134,44): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+  POLYNOMIAL-EVALUATION.vcxproj -> C:\Users\HMMS\source\repos\POLYNOMIAL-EVALUATION\x64\Debug\POLYNOMIAL-EVALUATION.exe
