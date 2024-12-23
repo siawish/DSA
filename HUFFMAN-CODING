@@ -1,1 +1,240 @@
+#include <iostream>
+#include<string>
+#include <queue>
+#include <unordered_map>
+#include <vector>
+#include <limits >
+#include<conio.h>
 
+using namespace std ;
+
+class Node {
+public:
+    char character;
+    int frequency;
+    Node* left;
+    Node* right;
+
+    Node(char c, int freq) : character(c), frequency(freq), left(NULL), right(NULL) {}
+    Node(Node* l, Node* r) : character(0), frequency(l->frequency + r->frequency), left(l), right(r) {}
+
+    bool operator>(const Node& other) const {
+        return frequency > other.frequency;
+    }
+};
+
+//  Huffman  traver
+void generateHuffmanCodes(Node* root, const string& code, unordered_map<char, string>& huffmanCodes) {
+    if (!root) return;
+    if (root->character != 0) huffmanCodes[root->character] = code;
+    generateHuffmanCodes(root->left, code + "0", huffmanCodes);
+    generateHuffmanCodes(root->right, code + "1", huffmanCodes);
+}
+
+// Encodeng
+string encodeString(const string& input, const unordered_map<char, string>& huffmanCodes) {
+    string encoded = "";
+    for (char c : input) {
+        encoded += huffmanCodes.at(c);
+    }
+    return encoded;
+}
+
+// return kerdo 
+string decodeString(const string& encoded, Node* root) {
+    string decoded = "";
+    Node* currentNode = root;
+    for (char bit : encoded) {
+        currentNode = (bit == '0') ? currentNode->left : currentNode->right;
+        if (currentNode->character != 0) {
+            decoded += currentNode->character;
+            currentNode = root;
+        }
+    }
+    return decoded;
+}
+
+
+void displayMenu() {
+    system("cls");
+    cout << "\n+=================== MENU =====================+\n"
+        << "|1. Input a String                              |\n"
+        << "|2. Display Frequency Table                     |\n"
+        << "|3. Display Huffman Codes                       |\n"
+        << "|4. Encode the String                           |\n"
+        << "|5. Decode the Encoded String                   |\n"
+        << "|6. Compare Size (Compression Ratio)            |\n"
+        << "|7. Exit                                        |\n"
+        << "+===============================================+\n"
+        << "Choose an option: ";
+}
+
+
+int getValidMenuChoice() {
+    int choice;
+    while (true) {
+        cin >> choice;
+        if (cin.fail() || choice < 1 || choice > 7) {
+            cin.clear();
+            cin.ignore();
+            cout << "Invalid choice. |nPlease enter a valid option (1-7): ";
+        }
+        else {
+            cin.ignore();
+            break;
+        }
+    }
+    return choice;
+}
+
+
+bool getValidInputString(string& input) {
+    cout << "\n Enter a string to encode using Huffman Coding Techniques : ";
+    getline(cin, input);
+    if (input.empty()) {
+        cout << "\n The string cannot be empty! \n";
+        return false;
+    }
+    return true;
+}
+
+int main() {
+    string input;
+    unordered_map<char, int> frequency;
+    unordered_map<char, string> huffmanCodes;
+    Node* root = NULL;
+    string encodedString;
+
+    while (true) {
+        displayMenu();
+        int choice = getValidMenuChoice();
+
+        switch (choice) {
+        case 1: {
+            if (getValidInputString(input)) {
+                frequency.clear();
+                for (char c : input) frequency[c]++;
+                cout << "\n String inputed \n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 2: {
+            if (input.empty()) {
+                cout << "plz enter string first !\n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            else {
+                cout << "\n Frequency Table:\n";
+                cout << " character | frequency " << endl;
+                for (const auto& entry : frequency) {
+                    cout << entry.first << "           | " << entry.second << "\n";
+
+                }
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 3: {
+            if (frequency.empty()) {
+                cout << "Error: No string has been entered yet!\n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            else {
+                priority_queue<Node*, vector<Node*>, greater<Node*>> minHeap;
+                for (const auto& entry : frequency) {
+                    minHeap.push(new Node(entry.first, entry.second));
+                }
+
+                while (minHeap.size() > 1) {
+                    Node* left = minHeap.top(); minHeap.pop();
+                    Node* right = minHeap.top(); minHeap.pop();
+                    minHeap.push(new Node(left, right));
+                }
+
+                root = minHeap.top();
+                huffmanCodes.clear();
+                generateHuffmanCodes(root, "", huffmanCodes);
+
+                cout << "\nCharacter | Frequency | Huffman Code:\n";
+                for (const auto& entry : huffmanCodes) {
+                    cout << entry.first << "        | " << frequency[entry.first] << "      | " << entry.second << '\n';
+                }
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 4: {
+            if (huffmanCodes.empty()) {
+                cout << "No Huffmen code  genera ted yet! \n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            else {
+                encodedString = encodeString(input, huffmanCodes);
+                cout << "\n Original String: " << input << '\n';
+                cout << "Encoded String: " << encodedString << '\n';
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 5: {
+            if (encodedString.empty()) {
+                cout << "\n Erro No encoded string available yet !\n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            else {
+                string decodedString = decodeString(encodedString, root);
+                cout << "\nDecoded String: " << decodedString << '\n';
+                cout << "Is the decoded string equal to the original string? "
+                    << (decodedString == input ? "Yes" : "No") << '\n';
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 6: {
+            if (input.empty() || encodedString.empty()) {
+                cout << "Error Insufficient data to calculate compression ratio!\n";
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            else {
+                int originalSize = input.size() * 8;
+                int encodedSize = encodedString.size();
+                double compressionRatio = (double)(originalSize - encodedSize) / originalSize * 100;
+
+                cout << "\n Original Size (in bits): " << originalSize << '\n';
+                cout << "Encoded Size (in bits): " << encodedSize << '\n';
+                cout << "Compression Ratio: " << compressionRatio << "%\n";
+                cout << "Note: Compression Ratio is calculated as ((Original Size - Encoded Size) / Original Size) * 100. Both the original and encoded sizes must be available to ensure this calculation is meaningful." << endl;
+                cout << "\n Press Any Key To Continue...";
+                _getch();
+            }
+            break;
+        }
+
+        case 7:
+            cout << "Exiting the program." << endl;
+            return 0;
+
+        default:
+            cout << "Invalid choice, please try again." << endl;
+
+            cout << "\n Press Any Key To Continue...";
+            _getch();
+        }
+    }
+}
